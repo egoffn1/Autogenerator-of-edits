@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web AutoEdit Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        input[type="file"]:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 20px auto;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+        }
+
+        .video-preview {
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .video-preview video {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            margin-top: 20px;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Web AutoEdit Generator</h1>
+        <p class="subtitle">Create stunning videos from your photos and clips with beat synchronization</p>
+
+        <!-- Upload Section -->
+        <div class="section">
+            <h2>📁 Step 1: Upload Your Files</h2>
+            
+            <div class="form-group">
+                <label for="mediaFiles">Select Photos/Videos (multiple files allowed)</label>
+                <input type="file" id="mediaFiles" multiple accept="image/*,video/*">
+                <div class="file-info" id="mediaInfo"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="audioFile">Select Audio File (MP3/WAV)</label>
+                <input type="file" id="audioFile" accept="audio/*">
+                <div class="file-info" id="audioInfo"></div>
+            </div>
+
+            <button class="btn" onclick="uploadFiles()" id="uploadBtn">Upload Files</button>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="section">
+            <h2>⚙️ Step 2: Configure Settings</h2>
+            
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="duration">Video Duration (seconds)</label>
+                        <input type="number" id="duration" value="30" min="5" max="300">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="beatsPerClip">Beats per Clip</label>
+                        <select id="beatsPerClip">
+                            <option value="1">1 beat</option>
+                            <option value="2" selected>2 beats</option>
+                            <option value="4">4 beats</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn" onclick="generateVideo()" id="generateBtn" disabled>
+            🎬 Create Video
+        </button>
+
+        <!-- Progress Section -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-text" id="progressText">Initializing...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+
+        <!-- Video Preview -->
+        <div class="video-preview" id="videoPreview">
+            <h2>✅ Your Video is Ready!</h2>
+            <video id="videoPlayer" controls></video>
+            <br>
+            <a id="downloadLink" class="btn download-btn" download>⬇️ Download Video</a>
+        </div>
+    </div>
+
+    <script>
+        let uploadedAudio = null;
+        let progressInterval = null;
+
+        // File info display
+        document.getElementById('mediaFiles').addEventListener('change', function(e) {
+            const count = e.target.files.length;
+            document.getElementById('mediaInfo').textContent = count > 0 ? 
+                `${count} file(s) selected` : '';
+        });
+
+        document.getElementById('audioFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('audioInfo').textContent = 
+                    `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                uploadedAudio = file.name;
+            } else {
+                document.getElementById('audioInfo').textContent = '';
+                uploadedAudio = null;
+            }
+        });
+
+        // Upload files
+        async function uploadFiles() {
+            const mediaFiles = document.getElementById('mediaFiles').files;
+            const audioFile = document.getElementById('audioFile').files[0];
+
+            if (mediaFiles.length === 0 && !audioFile) {
+                alert('Please select at least one file to upload');
+                return;
+            }
+
+            const formData = new FormData();
+            
+            for (let file of mediaFiles) {
+                formData.append('media_files', file);
+            }
+            
+            if (audioFile) {
+                formData.append('audio_file', audioFile);
+            }
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ Successfully uploaded ${result.files.length} file(s)!`);
+                    document.getElementById('generateBtn').disabled = false;
+                } else {
+                    alert('❌ Upload failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('❌ Upload error: ' + error.message);
+            }
+        }
+
+        // Generate video
+        async function generateVideo() {
+            const duration = document.getElementById('duration').value;
+            const beatsPerClip = document.getElementById('beatsPerClip').value;
+
+            if (!uploadedAudio) {
+                alert('Please upload an audio file first');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+
+            // Show progress container
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('videoPreview').style.display = 'none';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        audio_file: uploadedAudio,
+                        duration: parseInt(duration),
+                        beats_per_clip: parseInt(beatsPerClip)
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Start polling for progress
+                    pollProgress();
+                } else {
+                    alert('❌ Generation failed: ' + result.error);
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '🎬 Create Video';
+                }
+            } catch (error) {
+                alert('❌ Generation error: ' + error.message);
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🎬 Create Video';
+            }
+        }
+
+        // Poll progress
+        async function pollProgress() {
+            progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/progress');
+                    const data = await response.json();
+
+                    // Update progress bar
+                    document.getElementById('progressFill').style.width = data.percent + '%';
+                    document.getElementById('progressText').textContent = 
+                        `${data.message} (${data.percent}%)`;
+
+                    // Update log
+                    const logContainer = document.getElementById('logContainer');
+                    if (data.log && data.log.length > 0) {
+                        logContainer.innerHTML = data.log.map(entry => 
+                            `<div class="log-entry">${entry}</div>`
+                        ).join('');
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
+
+                    // Check completion
+                    if (data.status === 'completed') {
+                        clearInterval(progressInterval);
+                        showVideo(data.output_file);
+                        
+                        document.getElementById('generateBtn').disabled = false;
+                        document.getElementById('generateBtn').textContent = '🎬 Create Another Video';
+                    } else if (data.status === 'error') {
+                        clearInterval(progressInterval);
+                        alert('❌ Error: ' + data.error);
+                        
+                        document.getElementById('generateBtn').disabled = false;
+                        document.getElementById('generateBtn').textContent = '🎬 Create Video';
+                    }
+                } catch (error) {
+                    console.error('Progress polling error:', error);
+                }
+            }, 1000);
+        }
+
+        // Show video preview
+        function showVideo(filename) {
+            const videoPreview = document.getElementById('videoPreview');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const downloadLink = document.getElementById('downloadLink');
+
+            videoPlayer.src = `/output/${filename}`;
+            downloadLink.href = `/output/${filename}`;
+            
+            videoPreview.style.display = 'block';
+            videoPreview.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+        });
+    </script>
+</body>
+</html>
